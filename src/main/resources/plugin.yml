@@ -1,11 +1,29 @@
 name: AntiRelog
 version: ${project.version}
-main: ru.leymooo.antirelog.Antirelog
-api-version: 1.13
 prefix: AntiRelog
-softdepend: [Essentials, SuperVanish, PremiumVanish, VanishNoPacket, WorldGuard, LibsDisguises, CMI, ProtocolLib]
-authors: [Leymooo]
+authors: [Leymooo, Rejomy]
 description: AntiRelog
 website: http://rubukkit.org/threads/125331/
+softdepend:
+  - Essentials
+  - SuperVanish
+  - PremiumVanish
+  - VanishNoPacket
+  - WorldGuard
+  - LibsDisguises
+  - CMI
+  - ProtocolLib
+  - PacketEvents
+
 commands:
   antirelog:
+    description: Reload the plugin configuration.
+    usage: /antirelog reload
+
+permissions:
+  antirelog.reload:
+    description: Allows the use of the reload command.
+    default: op
+
+main: ru.leymooo.antirelog.Antirelog
+api-version: 1.13

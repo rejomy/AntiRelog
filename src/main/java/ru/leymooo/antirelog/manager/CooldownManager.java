@@ -5,7 +5,6 @@ import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.Plugin;
 import ru.leymooo.antirelog.Antirelog;
 import ru.leymooo.antirelog.config.Settings;
 import ru.leymooo.antirelog.util.ProtocolLibUtils;
@@ -28,7 +27,7 @@ public class CooldownManager {
     public CooldownManager(Antirelog plugin, Settings settings) {
         this.plugin = plugin;
         this.settings = settings;
-        if (plugin.isProtocolLibEnabled()) {
+        if (plugin.isProtocolLib()) {
             scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
         } else {
             scheduledExecutorService = null;
@@ -40,7 +39,7 @@ public class CooldownManager {
     }
 
     public void addItemCooldown(Player player, CooldownType type, long duration) {
-        if (!plugin.isProtocolLibEnabled()) {
+        if (!plugin.isProtocolLib()) {
             return;
         }
         int durationInTicks = (int) Math.ceil(duration / 50.0);
@@ -58,7 +57,7 @@ public class CooldownManager {
     }
 
     public void removeItemCooldown(Player player, CooldownType type) {
-        if (!plugin.isProtocolLibEnabled()) {
+        if (!plugin.isProtocolLib()) {
             return;
         }
         ScheduledFuture future = futures.get(player, type);
@@ -130,7 +129,7 @@ public class CooldownManager {
         GOLDEN_APPLE(Material.GOLDEN_APPLE, Settings::getGoldenAppleCooldown),
         ENC_GOLDEN_APPLE(VersionUtils.isVersion(13) ? Material.ENCHANTED_GOLDEN_APPLE : Material.GOLDEN_APPLE, Settings::getEnchantedGoldenAppleCooldown),
         ENDER_PEARL(Material.ENDER_PEARL, Settings::getEnderPearlCooldown),
-        CHORUS(Material.matchMaterial("CHORUS_FRUIT"), Settings::getСhorusCooldown),
+        CHORUS(Material.matchMaterial("CHORUS_FRUIT"), Settings::getChorusCooldown),
         TOTEM(VersionUtils.isVersion(13) ? Material.TOTEM_OF_UNDYING : Material.matchMaterial("TOTEM"), Settings::getTotemCooldown),
         FIREWORK(VersionUtils.isVersion(13) ? Material.FIREWORK_ROCKET : Material.matchMaterial("FIREWORK"), Settings::getFireworkCooldown);
 

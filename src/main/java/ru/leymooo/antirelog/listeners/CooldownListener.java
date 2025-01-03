@@ -20,6 +20,7 @@ import ru.leymooo.antirelog.event.PvpStoppedEvent;
 import ru.leymooo.antirelog.manager.CooldownManager;
 import ru.leymooo.antirelog.manager.CooldownManager.CooldownType;
 import ru.leymooo.antirelog.manager.PvPManager;
+import ru.leymooo.antirelog.util.EntityUtil;
 import ru.leymooo.antirelog.util.Utils;
 import ru.leymooo.antirelog.util.VersionUtils;
 
@@ -48,7 +49,7 @@ public class CooldownListener implements Listener {
                     }
                     Player player = (Player) event.getEntity();
                     long cooldownTime = settings.getTotemCooldown();
-                    if (cooldownTime == 0 || pvpManager.isBypassed(player)) {
+                    if (cooldownTime == 0 || EntityUtil.hasBypass(player)) {
                         return;
                     }
                     if (cooldownTime <= -1) {
@@ -77,7 +78,7 @@ public class CooldownListener implements Listener {
 
         if (isChorus(consumeItem)) {
             cooldownType = CooldownType.CHORUS;
-            cooldownTime = settings.getСhorusCooldown();
+            cooldownTime = settings.getChorusCooldown();
         }
         if (isGoldenOrEnchantedApple(consumeItem)) {
             boolean enchanted = isEnchantedGoldenApple(consumeItem);
@@ -86,7 +87,7 @@ public class CooldownListener implements Listener {
         }
 
         if (cooldownType != null) {
-            if (cooldownTime == 0 || pvpManager.isBypassed(event.getPlayer())) {
+            if (cooldownTime == 0 || EntityUtil.hasBypass(event.getPlayer())) {
                 return;
             }
             if (cooldownTime <= -1) {
@@ -108,7 +109,7 @@ public class CooldownListener implements Listener {
     public void onPerlLaunch(ProjectileLaunchEvent e) {
         if (settings.getEnderPearlCooldown() > 0 && e.getEntityType() == EntityType.ENDER_PEARL && e.getEntity().getShooter() instanceof Player) {
             Player p = (Player) e.getEntity().getShooter();
-            if (!pvpManager.isBypassed(p)) {
+            if (!EntityUtil.hasBypass(p)) {
                 cooldownManager.addCooldown(p, CooldownType.ENDER_PEARL);
                 addItemCooldownIfNeeded(p, CooldownType.ENDER_PEARL);
             }
@@ -119,7 +120,7 @@ public class CooldownListener implements Listener {
     public void onInteract(PlayerInteractEvent event) {
         if (settings.getEnderPearlCooldown() == 0 && settings.getFireworkCooldown() == 0) return;
         if (!event.hasItem()) return;
-        if (pvpManager.isBypassed(event.getPlayer())) return;
+        if (EntityUtil.hasBypass(event.getPlayer())) return;
 
         if (settings.getEnderPearlCooldown() != 0 && event.getItem().getType() == Material.ENDER_PEARL) {
             if (settings.getEnderPearlCooldown() <= -1) {

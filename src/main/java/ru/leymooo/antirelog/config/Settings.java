@@ -1,20 +1,25 @@
 package ru.leymooo.antirelog.config;
 
 
+import lombok.Getter;
 import ru.leymooo.annotatedyaml.Annotations.*;
 
 import ru.leymooo.annotatedyaml.Configuration;
-import ru.leymooo.annotatedyaml.ConfigurationProvider;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Getter
 public class Settings extends Configuration {
 
     @Final
     @Key("config-version")
     private String configVersion = "1.7";
-    private Messages messages = new Messages();
+    private final Messages messages = new Messages();
+
+    @Comment({"Замораживать пвп таймер, если игрок завис?", "Некоторые могут намеренно замораживать майн и ждать пока пройдёт кд, чтобы не упасть в бездну, к примеру."})
+    @Key("prevent-lags")
+    private boolean preventLags = false;
 
     @Comment("Кулдавн для обычных золотых яблок во время пвп.")
     @Key("golden-apple-cooldown")
@@ -33,7 +38,7 @@ public class Settings extends Configuration {
     @Comment({"Кулдавн для корусов во время пвп.", "https://minecraft-ru.gamepedia.com/Плод_коруса", "Значение 0 отключает кулдаун; -1 " +
             "отключает использование во время пвп"})
     @Key("chorus-cooldown")
-    private int сhorusCooldown = 7;
+    private int chorusCooldown = 7;
 
     @Comment({"Кулдавн для фейверков во время пвп. (чтобы не убегали на элитрах)", "Значение 0 отключает кулдаун; -1 отключает использование во время пвп"})
     @Key("firework-cooldown")
@@ -141,112 +146,8 @@ public class Settings extends Configuration {
         this.disabledWorldsSet = disabledWorlds.stream().map(String::toLowerCase).collect(Collectors.toSet());
     }
 
-    public String getConfigVersion() {
-        return configVersion;
-    }
-
-    public Messages getMessages() {
-        return messages;
-    }
-
-    public int getGoldenAppleCooldown() {
-        return goldenAppleCooldown;
-    }
-
-    public int getEnchantedGoldenAppleCooldown() {
-        return enchantedGoldenAppleCooldown;
-    }
-
-    public int getEnderPearlCooldown() {
-        return enderPearlCooldown;
-    }
-
-    public int getСhorusCooldown() {
-        return сhorusCooldown;
-    }
-
-    public int getFireworkCooldown() {
-        return fireworkCooldown;
-    }
-
-    public int getTotemCooldown() {
-        return totemCooldown;
-    }
-
-    public int getPvpTime() {
-        return pvpTime;
-    }
-
-    public boolean isDisableCommandsInPvp() {
-        return disableCommandsInPvp;
-    }
-
-    public boolean isCancelInteractWithEntities() {
-        return cancelInteractWithEntities;
-    }
-
-    public List<String> getCommandsOnPowerupsDisable() {
-        return commandsOnPowerupsDisable;
-    }
-
-    public List<String> getWhiteListedCommands() {
-        return whiteListedCommands;
-    }
-
-    public boolean isKillOnLeave() {
-        return killOnLeave;
-    }
-
-    public boolean isKillOnKick() {
-        return killOnKick;
-    }
-
-    public boolean isRunCommandsOnKick() {
-        return runCommandsOnKick;
-    }
-
-    public List<String> getKickMessages() {
-        return kickMessages;
-    }
-
-    public boolean isDisablePowerups() {
-        return disablePowerups;
-    }
-
-    public boolean isDisableTeleportsInPvp() {
-        return disableTeleportsInPvp;
-    }
-
-    public boolean isIgnoreWorldGuard() {
-        return ignoreWorldGuard;
-    }
-
     public Set<String> getIgnoredWgRegions() {
         return ignoredWgRegionsSet;
-    }
-
-    public boolean isDisablePvpInIgnoredRegion() {
-        return disablePvpInIgnoredRegion;
-    }
-
-    public boolean isJoinPvPInWorldGuard() {
-        return joinPvPInWorldGuard;
-    }
-
-    public boolean isHideJoinMessage() {
-        return hideJoinMessage;
-    }
-
-    public boolean isHideLeaveMessage() {
-        return hideLeaveMessage;
-    }
-
-    public boolean isHideDeathMessage() {
-        return hideDeathMessage;
-    }
-
-    public List<String> getCommandsOnLeave() {
-        return commandsOnLeave;
     }
 
     public Set<String> getDisabledWorlds() {
@@ -261,7 +162,7 @@ public class Settings extends Configuration {
                 ", goldenAppleCooldown=" + goldenAppleCooldown +
                 ", enchantedGoldenAppleCooldown=" + enchantedGoldenAppleCooldown +
                 ", enderPearlCooldown=" + enderPearlCooldown +
-                ", сhorusCooldown=" + сhorusCooldown +
+                ", сhorusCooldown=" + chorusCooldown +
                 ", fireworkCooldown=" + fireworkCooldown +
                 ", totemCooldown=" + totemCooldown +
                 ", pvpTime=" + pvpTime +

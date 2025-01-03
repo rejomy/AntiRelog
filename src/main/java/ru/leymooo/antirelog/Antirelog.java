@@ -1,22 +1,19 @@
 package ru.leymooo.antirelog;
 
+import lombok.Getter;
 import org.bukkit.Bukkit;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.codemc.worldguardwrapper.WorldGuardWrapper;
 import ru.leymooo.annotatedyaml.Configuration;
 import ru.leymooo.annotatedyaml.ConfigurationProvider;
 import ru.leymooo.annotatedyaml.provider.BukkitConfigurationProvider;
+import ru.leymooo.antirelog.command.ReloadCommand;
 import ru.leymooo.antirelog.config.Settings;
 import ru.leymooo.antirelog.listeners.CooldownListener;
 import ru.leymooo.antirelog.listeners.EssentialsTeleportListener;
 import ru.leymooo.antirelog.listeners.PvPListener;
 import ru.leymooo.antirelog.listeners.WorldGuardListener;
-import ru.leymooo.antirelog.manager.BossbarManager;
-import ru.leymooo.antirelog.manager.CooldownManager;
-import ru.leymooo.antirelog.manager.PowerUpsManager;
-import ru.leymooo.antirelog.manager.PvPManager;
+import ru.leymooo.antirelog.manager.*;
 import ru.leymooo.antirelog.util.ProtocolLibUtils;
 
 import java.io.File;
@@ -32,12 +29,22 @@ import java.util.logging.Level;
 import java.util.stream.Stream;
 import ru.leymooo.antirelog.util.VersionUtils;
 
+@Getter
 public class Antirelog extends JavaPlugin {
+
+    public static Antirelog INSTANCE;
+
     private Settings settings;
     private PvPManager pvpManager;
     private CooldownManager cooldownManager;
     private boolean protocolLib;
-    private boolean worldguard;
+    private boolean worldGuard;
+    private boolean packetEvents;
+
+    @Override
+    public void onLoad() {
+        INSTANCE = this;
+    }
 
     @Override
     public void onEnable() {
@@ -45,21 +52,15 @@ public class Antirelog extends JavaPlugin {
         pvpManager = new PvPManager(settings, this);
         detectPlugins();
         cooldownManager = new CooldownManager(this, settings);
+
         if (protocolLib) {
             ProtocolLibUtils.createListener(cooldownManager, pvpManager, this);
         }
+
         getServer().getPluginManager().registerEvents(new PvPListener(this, pvpManager, settings), this);
         getServer().getPluginManager().registerEvents(new CooldownListener(this, cooldownManager, pvpManager, settings), this);
-    }
 
-    @Override
-    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        if (args.length > 0 && args[0].equalsIgnoreCase("reload") && sender.hasPermission("antirelog.reload")) {
-            reloadSettings();
-            sender.sendMessage("§aReloaded");
-            getLogger().info(settings.toString());
-        }
-        return true;
+        getCommand("antirelog").setExecutor(new ReloadCommand(this));
     }
 
     private void loadConfig() {
@@ -87,7 +88,7 @@ public class Antirelog extends JavaPlugin {
             getLogger().info("config.yml успешно создан");
         } else if (provider.isFileSuccessfullyLoaded()) {
             if (settings.load()) {
-                if (!((String) provider.get("config-version")).equals(settings.getConfigVersion())) {
+                if (!provider.get("config-version").equals(settings.getConfigVersion())) {
                     getLogger().info("Конфиг был обновлен. Проверьте новые значения");
                     settings.save();
                 }
@@ -164,43 +165,32 @@ public class Antirelog extends JavaPlugin {
 
     public void reloadSettings() {
         settings.getConfigurationProvider().reloadFileFromDisk();
+
         if (settings.getConfigurationProvider().isFileSuccessfullyLoaded()) {
             settings.load();
         }
+
         getServer().getScheduler().cancelTasks(this);
+
         pvpManager.onPluginDisable();
         pvpManager.onPluginEnable();
         cooldownManager.clearAll();
-    }
-
-    public boolean isProtocolLibEnabled() {
-        return protocolLib;
-    }
-
-    public boolean isWorldguardEnabled() {
-        return worldguard;
+        DataManager.clear();
     }
 
     private void detectPlugins() {
         if (Bukkit.getPluginManager().isPluginEnabled("WorldGuard")) {
             WorldGuardWrapper.getInstance().registerEvents(this);
             Bukkit.getPluginManager().registerEvents(new WorldGuardListener(settings, pvpManager), this);
-            worldguard = true;
+            worldGuard = true;
         }
         try {
             Class.forName("net.ess3.api.events.teleport.PreTeleportEvent");
             Bukkit.getPluginManager().registerEvents(new EssentialsTeleportListener(pvpManager, settings), this);
         } catch (ClassNotFoundException e) {
         }
+
         protocolLib = Bukkit.getPluginManager().isPluginEnabled("ProtocolLib") && VersionUtils.isVersion(9);
-    }
-
-    public Settings getSettings() {
-        return settings;
-    }
-
-    public PvPManager getPvpManager() {
-        return pvpManager;
     }
 
     public PowerUpsManager getPowerUpsManager() {
@@ -211,7 +201,4 @@ public class Antirelog extends JavaPlugin {
         return pvpManager.getBossbarManager();
     }
 
-    public CooldownManager getCooldownManager() {
-        return cooldownManager;
-    }
 }
