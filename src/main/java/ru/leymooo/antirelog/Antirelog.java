@@ -39,7 +39,6 @@ public class Antirelog extends JavaPlugin {
     private CooldownManager cooldownManager;
     private boolean protocolLib;
     private boolean worldGuard;
-    private boolean packetEvents;
 
     @Override
     public void onLoad() {

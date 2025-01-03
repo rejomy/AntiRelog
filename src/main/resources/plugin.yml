@@ -13,7 +13,6 @@ softdepend:
   - LibsDisguises
   - CMI
   - ProtocolLib
-  - PacketEvents
 
 commands:
   antirelog:
