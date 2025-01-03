@@ -113,7 +113,6 @@ public class PvPManager {
                 return;
             }
 
-            Bukkit.broadcastMessage("start");
             tryStartPvP(attacker, defender);
         }
     }
