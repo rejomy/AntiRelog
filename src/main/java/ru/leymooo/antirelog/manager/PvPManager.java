@@ -89,7 +89,8 @@ public class PvPManager {
     }
 
     public boolean isInPvP(Player player) {
-        return DataManager.contains(player);
+        PlayerData data = DataManager.get(player);
+        return data != null && !data.isBypassed();
     }
 
     public boolean isInSilentPvP(Player player) {
