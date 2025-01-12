@@ -119,11 +119,7 @@ public class PvPManager {
     }
 
     private void tryStartPvP(Player attacker, Player defender) {
-        if (EntityUtil.isInIgnoredWorld(attacker)) {
-            return;
-        }
-
-        if (isInIgnoredRegion(attacker) || isInIgnoredRegion(defender)) {
+        if (EntityUtil.isInIgnoredWorld(attacker) || isInIgnoredRegion(attacker) || isInIgnoredRegion(defender)) {
             return;
         }
 
@@ -143,7 +139,6 @@ public class PvPManager {
 
         boolean attackerBypassed = EntityUtil.hasBypassPermission(attacker);
         boolean defenderBypassed = EntityUtil.hasBypassPermission(defender);
-
         if (attackerBypassed && defenderBypassed) {
             return;
         }
@@ -151,6 +146,7 @@ public class PvPManager {
         boolean attackerInPvp = isInPvP(attacker) || isInSilentPvP(attacker);
         boolean defenderInPvp = isInPvP(defender) || isInSilentPvP(defender);
         PvPStatus pvpStatus = PvPStatus.ALL_NOT_IN_PVP;
+
         if (attackerInPvp && defenderInPvp) {
             updateAttackerAndCallEvent(attacker, defender, attackerBypassed);
             updateDefenderAndCallEvent(defender, attacker, defenderBypassed);
@@ -160,6 +156,7 @@ public class PvPManager {
         } else if (defenderInPvp) {
             pvpStatus = PvPStatus.DEFENDER_IN_PVP;
         }
+
         if (pvpStatus == PvPStatus.ATTACKER_IN_PVP || pvpStatus == PvPStatus.DEFENDER_IN_PVP) {
             if (callPvpPreStartEvent(defender, attacker, pvpStatus)) {
                 if (attackerInPvp) {
@@ -171,6 +168,7 @@ public class PvPManager {
                 }
                 Bukkit.getPluginManager().callEvent(new PvpStartedEvent(defender, attacker, settings.getPvpTime(), pvpStatus));
             }
+
             return;
         }
 
@@ -282,11 +280,14 @@ public class PvPManager {
     private void sendTitles(Player player, boolean isPvpStarted) {
         String title = isPvpStarted ? settings.getMessages().getPvpStartedTitle() : settings.getMessages().getPvpStoppedTitle();
         String subtitle = isPvpStarted ? settings.getMessages().getPvpStartedSubtitle() : settings.getMessages().getPvpStoppedSubtitle();
-        title = title.isEmpty() ? null : Utils.color(title);
-        subtitle = subtitle.isEmpty() ? null : Utils.color(subtitle);
-        if (title == null && subtitle == null) {
+
+        if (title.isEmpty() && subtitle.isEmpty()) {
             return;
         }
+
+        title = "§r" + Utils.color(title);
+        subtitle = "§r" + Utils.color(subtitle);
+
         if (VersionUtils.isVersion(11)) {
             player.sendTitle(title, subtitle, 10, 30, 10);
         } else {

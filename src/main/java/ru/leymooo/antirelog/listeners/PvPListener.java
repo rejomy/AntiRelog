@@ -177,23 +177,26 @@ public class PvPListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
-    public void onQuit(PlayerQuitEvent e) {
-        allowedTeleports.remove(e.getPlayer());
+    public void onQuit(PlayerQuitEvent event) {
+        Player player = event.getPlayer();
+
+        allowedTeleports.remove(player);
+
         if (settings.isHideLeaveMessage()) {
-            e.setQuitMessage(null);
+            event.setQuitMessage(null);
         }
-        if (pvpManager.isInPvP(e.getPlayer())) {
-            pvpManager.stopPvPSilent(e.getPlayer());
+
+        if (pvpManager.isInPvP(player)) {
+            pvpManager.stopPvPSilent(player);
+
             if (settings.isKillOnLeave()) {
-                sendLeavedInPvpMessage(e.getPlayer());
-                e.getPlayer().setHealth(0);
-            } else {
-                pvpManager.stopPvPSilent(e.getPlayer());
+                sendLeavedInPvpMessage(player);
+                player.setHealth(0);
             }
-            runCommands(e.getPlayer());
-        }
-        if (pvpManager.isInSilentPvP(e.getPlayer())) {
-            pvpManager.stopPvPSilent(e.getPlayer());
+
+            runCommands(player);
+        } else if (pvpManager.isInSilentPvP(player)) {
+            pvpManager.stopPvPSilent(player);
         }
     }
 
