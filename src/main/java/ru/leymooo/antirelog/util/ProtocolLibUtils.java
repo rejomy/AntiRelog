@@ -54,11 +54,7 @@ public class ProtocolLibUtils {
     }
 
     public static void sendPacket(PacketContainer packetContainer, Player player) {
-        try {
-            ProtocolLibrary.getProtocolManager().sendServerPacket(player, packetContainer);
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
-        }
+        ProtocolLibrary.getProtocolManager().sendServerPacket(player, packetContainer);
     }
 
     public static void createListener(CooldownManager cooldownManager, PvPManager pvPManager, Plugin plugin) {
